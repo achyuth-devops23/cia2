@@ -6,6 +6,7 @@ pipeline {
         ECR_REPO = 'my-web-app'
         AWS_ACCOUNT_ID = credentials('aws-account-id')
         IMAGE_TAG = "${BUILD_NUMBER}"
+        EC2_HOST = credentials('ec2-host')
     }
     
     stages {
@@ -57,7 +58,12 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 script {
-                    echo 'Deployment stage - configured manually on EC2'
+                    sshagent(['ec2-ssh-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} 'bash -s' < deploy-remote.sh ${IMAGE_TAG}
+                        """
+                    }
+                    echo 'Deployed to EC2'
                 }
             }
         }
