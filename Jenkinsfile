@@ -36,29 +36,34 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "🐳 Building Docker image..."
+                    echo "🐳 Building multi-architecture Docker image (amd64 + arm64)..."
                     retry(2) {
-                        sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ."
+                        sh """
+                            docker buildx build --platform linux/amd64,linux/arm64 \
+                                -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} \
+                                --push .
+                        """
                     }
                 }
             }
         }
 
-        stage('Push to ECR') {
-            steps {
-                script {
-                    withAWS(credentials: 'aws-credentials', region: AWS_REGION) {
-                        sh """
-                            echo "🔐 Logging in to ECR..."
-                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                            docker tag ${ECR_REPO}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
-                        """
-                    }
-                    echo '✅ Image pushed to ECR successfully.'
-                }
-            }
-        }
+
+        // stage('Push to ECR') {
+        //     steps {
+        //         script {
+        //             withAWS(credentials: 'aws-credentials', region: AWS_REGION) {
+        //                 sh """
+        //                     echo "🔐 Logging in to ECR..."
+        //                     aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+        //                     docker tag ${ECR_REPO}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+        //                     docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+        //                 """
+        //             }
+        //             echo '✅ Image pushed to ECR successfully.'
+        //         }
+        //     }
+        // }
 
         stage('Deploy to EC2') {
             steps {
