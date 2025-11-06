@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     environment {
-        AWS_REGION = 'us-east-1'
+        AWS_REGION = 'ap-south-2'
         ECR_REPO = 'my-web-app'
-        AWS_ACCOUNT_ID = credentials('aws-account-id')
+        AWS_ACCOUNT_ID = credentials('111596617699')
         IMAGE_TAG = "${BUILD_NUMBER}"
         EC2_HOST = credentials('ec2-host')
     }
