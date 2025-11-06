@@ -65,13 +65,13 @@ pipeline {
         //     }
         // }
 
-        stage('Deploy to EC2') {
+stage('Deploy to EC2') {
     steps {
         script {
             echo "🚀 Deploying to EC2..."
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'KEYFILE', usernameVariable: 'USER')]) {
                 sh """
-                    ssh -i $KEYFILE -o StrictHostKeyChecking=no $USER@${EC2_HOST} << 'EOF'
+                    ssh -i $KEYFILE -o StrictHostKeyChecking=no $USER@${EC2_HOST} '
                         echo "🔐 Logging in to ECR on EC2..."
                         aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
@@ -86,12 +86,13 @@ pipeline {
                         sudo docker run -d --name cia2-app -p 80:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
 
                         echo "✅ Deployment successful on EC2!"
-                    EOF
+                    '
                 """
             }
         }
     }
 }
+
 
 
 
