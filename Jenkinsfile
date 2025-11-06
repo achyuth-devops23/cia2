@@ -71,7 +71,7 @@ pipeline {
                     echo "🚀 Deploying to EC2..."
                     withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'KEYFILE', usernameVariable: 'USER')]) {
                         sh """
-                            ssh -i $KEYFILE -o StrictHostKeyChecking=no $USER@${EC2_HOST} << EOF
+                            ssh -i $KEYFILE -o StrictHostKeyChecking=no $USER@${EC2_HOST} << 'EOF'
                                 echo "🔐 Logging in to ECR on EC2..."
                                 aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
