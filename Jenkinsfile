@@ -8,7 +8,7 @@ pipeline {
     environment {
         AWS_REGION = 'ap-south-2'
         AWS_ACCOUNT_ID = '111596617699'
-        ECR_REPO = '111596617699.dkr.ecr.ap-south-2.amazonaws.com/us-east-1/cia2-app'
+        ECR_REPO = 'us-east-1/cia2-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
         EC2_HOST = credentials('ec2-ssh-key')  // Jenkins secret with EC2 DNS/IP
     }
