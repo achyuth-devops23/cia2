@@ -86,7 +86,7 @@ pipeline {
                                 sudo docker run -d --name cia2-app -p 80:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
 
                                 echo "✅ Deployment successful on EC2!"
-                            EOF
+                            'EOF'
                         """
                     }
                 }
