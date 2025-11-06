@@ -10,7 +10,7 @@ pipeline {
         AWS_ACCOUNT_ID = '111596617699'
         ECR_REPO = 'us-east-1/cia2-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        EC2_HOST = credentials('ec2-ssh-key')  // Jenkins secret with EC2 DNS/IP
+        EC2_HOST = credentials('ec2-host')  // Jenkins secret with EC2 DNS/IP
     }
 
     stages {
@@ -64,9 +64,9 @@ pipeline {
             steps {
                 script {
                     echo "🚀 Deploying to EC2..."
-                    sshagent(['ec2-ssh-key']) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'KEYFILE', usernameVariable: 'USER')]) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} << 'EOF'
+                            ssh -i $KEYFILE -o StrictHostKeyChecking=no $USER@${EC2_HOST} << 'EOF'
                                 sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
                                 sudo docker stop cia2-app || true
                                 sudo docker rm cia2-app || true
@@ -78,6 +78,7 @@ pipeline {
                 }
             }
         }
+
     }
 
     post {
