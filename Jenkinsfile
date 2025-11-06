@@ -6,7 +6,7 @@ pipeline {
         AWS_ACCOUNT_ID = '111596617699'
         ECR_REPO = 'cia2-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        EC2_HOST = credentials('ec2-user')  // stored Jenkins secret containing EC2 public DNS or IP
+        EC2_HOST = credentials('ec2-ssh-key')  // stored Jenkins secret containing EC2 public DNS or IP
     }
 
     stages {
